@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Dynamic Image Gallery</title>
+        <style>
+        img {
+            width: 300px; /* Set images to a consistent size */
+            margin: 10px;
+        }
+        </style>
+    </head>
+    <body>
+    <div id="image-gallery"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('update', function(data) {
+        const gallery = document.getElementById('image-gallery');
+        gallery.innerHTML = ''; // Clear gallery
+        addImagesToGallery(data, gallery);
+        });
+
+        function addImagesToGallery(node, container) {
+        if (node.screen && node.screen_id) {
+            const imgElement = document.createElement('img');
+            imgElement.src = node.screen; // Using the 'screen' attribute as the image source
+            imgElement.alt = node.screen_id; // Using the 'screen_id' as the alt text
+            container.appendChild(imgElement);
+        }
+        
+        // Recursively process children if they exist
+        if (node.children && node.children.length > 0) {
+            node.children.forEach(child => addImagesToGallery(child, container));
+        }
+        }
+    </script>
+    Test 
+            <!--<img src="/1713541314030/0/screenshots/antenna--1--1.png" width="300" > -->
+    </body>
+</html>
+
+
+
+
+
+

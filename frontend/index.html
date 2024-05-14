@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Image Gallery</title>
+    <style>
+        .image-container {
+            margin-top: 10px;
+            position: relative;
+            padding: 10px;
+        }
+        img {
+            width: 200px; /* Reduced size for nested view */
+            margin: 10px;
+            display: block; /* Ensures each image starts on a new line */
+        }
+        .children-container {
+            margin-top: 20px;
+            display: flex; /* Aligns children horizontally */
+            flex-wrap: wrap; /* Allows items to wrap as needed */
+            padding-left: 20px; /* Padding for visual nesting effect */
+        }
+    </style>
+</head>
+<body>
+<div id="image-gallery"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('update', function(data) {
+        const gallery = document.getElementById('image-gallery');
+        gallery.innerHTML = ''; // Clear the gallery
+        if (Array.isArray(data)) {
+            data.forEach(item => addImagesToGallery(item, gallery, 0));
+        } else {
+            addImagesToGallery(data, gallery, 0); // Single object entry
+        }
+    });
+
+    function addImagesToGallery(node, container, depth) {
+        if (node.screen && node.screen_id) {
+            // Create the container for this image
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'image-container';
+
+            // Create and append the image element
+            const imgElement = document.createElement('img');
+            imgElement.src = node.screen;
+            imgElement.alt = node.screen_id;
+            imageDiv.appendChild(imgElement);
+
+            // Append this image's div to the parent container
+            container.appendChild(imageDiv);
+
+            // If there are children, create a sub-container for them
+            if (node.children && node.children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'children-container'; // Horizontal layout for all child levels
+                imageDiv.appendChild(childrenContainer); // Nesting the children under the image's div
+                node.children.forEach(child => addImagesToGallery(child, childrenContainer, depth + 1));
+            }
+        }
+    }
+</script>
+</body>
+</html>

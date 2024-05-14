@@ -1,0 +1,3 @@
+appId: de.danoeh.antennapod
+---
+- assertNotVisible: "Some Dummy Text To Cause No Action"
